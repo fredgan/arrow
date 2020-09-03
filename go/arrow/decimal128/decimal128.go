@@ -27,14 +27,19 @@ var (
 // Semi-numerical Algorithms section 4.3.1.
 //
 // Adapted from the Apache ORC C++ implementation
+/*
 type Num struct {
-	lo uint64 // low bits
+	lo  uint64 // low bits
 	hi int64  // high bits
+}*/
+type Num struct {
+	Low uint64 `json:"lows"` // low bits
+	High int64  `json:"highs"`// high bits
 }
 
 // New returns a new signed 128-bit integer value.
-func New(hi int64, lo uint64) Num {
-	return Num{lo: lo, hi: hi}
+func New(High int64, Low uint64) Num {
+	return Num{Low: Low, High: High}
 }
 
 // FromU64 returns a new signed 128-bit integer value from the provided uint64 one.
@@ -55,10 +60,10 @@ func FromI64(v int64) Num {
 }
 
 // LowBits returns the low bits of the two's complement representation of the number.
-func (n Num) LowBits() uint64 { return n.lo }
+func (n Num) LowBits() uint64 { return n.Low }
 
 // HighBits returns the high bits of the two's complement representation of the number.
-func (n Num) HighBits() int64 { return n.hi }
+func (n Num) HighBits() int64 { return n.High }
 
 // Sign returns:
 //
@@ -69,5 +74,5 @@ func (n Num) Sign() int {
 	if n == (Num{}) {
 		return 0
 	}
-	return int(1 | (n.hi >> 63))
+	return int(1 | (n.High >> 63))
 }
