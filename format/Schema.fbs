@@ -395,8 +395,6 @@ table Schema {
   /// endianness of the buffer
   /// it is Little Endian by default
   /// if endianness doesn't match the underlying system then the vectors need to be converted
-  /// Little Endian: data memory from litter to big [0 0 0 0 0 2 f 8]
-  /// big Endian: data memory from big to litter[8 f 2 0 0 0 0 0 ]
   endianness: Endianness=Little;
 
 

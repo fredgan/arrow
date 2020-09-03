@@ -19,13 +19,13 @@
 package arrjson // import "github.com/apache/arrow/go/arrow/internal/arrjson"
 
 import (
-	"github.com/apache/arrow/go/arrow/array"
-	"github.com/apache/arrow/go/arrow/internal/arrdata"
-	"github.com/apache/arrow/go/arrow/memory"
 	"io"
 	"io/ioutil"
 	"os"
 	"testing"
+	"github.com/apache/arrow/go/arrow/array"
+	"github.com/apache/arrow/go/arrow/internal/arrdata"
+	"github.com/apache/arrow/go/arrow/memory"
 )
 
 func TestReadWrite(t *testing.T) {
