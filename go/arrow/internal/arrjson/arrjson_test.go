@@ -11,20 +11,21 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 package arrjson // import "github.com/apache/arrow/go/arrow/internal/arrjson"
 
 import (
+	"github.com/apache/arrow/go/arrow/array"
+	"github.com/apache/arrow/go/arrow/internal/arrdata"
+	"github.com/apache/arrow/go/arrow/memory"
 	"io"
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"github.com/apache/arrow/go/arrow/array"
-	"github.com/apache/arrow/go/arrow/internal/arrdata"
-	"github.com/apache/arrow/go/arrow/memory"
 )
 
 func TestReadWrite(t *testing.T) {
@@ -49,9 +50,6 @@ func TestReadWrite(t *testing.T) {
 
 	for name, recs := range arrdata.Records {
 		t.Run(name, func(t *testing.T) {
-			if name == "decimal128" {
-				t.Skip() // FIXME(sbinet): implement full decimal128 support
-			}
 			mem := memory.NewCheckedAllocator(memory.NewGoAllocator())
 			defer mem.AssertSize(t, 0)
 
@@ -3097,8 +3095,140 @@ func makeDurationsWantJSONs() string {
     }
   ]
 }`
+
 }
 
 func makeDecimal128sWantJSONs() string {
-	return `` // FIXME(fredgan): implement full decimal128 JSON support
+	return `{
+  "schema": {
+    "fields": [
+      {
+        "name": "dec128s",
+        "type": {
+          "name": "decimal",
+          "byteWidth": 16
+        },
+        "nullable": true,
+        "children": []
+      }
+    ]
+  },
+  "batches": [
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            {
+              "lows": 31,
+              "highs": 31
+            },
+            {
+              "lows": 32,
+              "highs": 32
+            },
+            {
+              "lows": 33,
+              "highs": 33
+            },
+            {
+              "lows": 34,
+              "highs": 34
+            },
+            {
+              "lows": 35,
+              "highs": 35
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            {
+              "lows": 41,
+              "highs": 41
+            },
+            {
+              "lows": 42,
+              "highs": 42
+            },
+            {
+              "lows": 43,
+              "highs": 43
+            },
+            {
+              "lows": 44,
+              "highs": 44
+            },
+            {
+              "lows": 45,
+              "highs": 45
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            {
+              "lows": 51,
+              "highs": 51
+            },
+            {
+              "lows": 52,
+              "highs": 52
+            },
+            {
+              "lows": 53,
+              "highs": 53
+            },
+            {
+              "lows": 54,
+              "highs": 54
+            },
+            {
+              "lows": 55,
+              "highs": 55
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}`// FIXME(fredgan): implement full decimal128 JSON support
+
 }
