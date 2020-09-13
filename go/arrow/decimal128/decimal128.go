@@ -16,6 +16,7 @@
 
 package decimal128 // import "github.com/apache/arrow/go/arrow/decimal128"
 
+
 var (
 	MaxDecimal128 = New(542101086242752217, 687399551400673280-1)
 )
@@ -54,6 +55,21 @@ func FromI64(v int64) Num {
 	}
 }
 
+func FromString(v string, precision *int, scale *int) (Num, error) {
+	// TODO(fredgan): parse string to Decimal128
+	return Num{}, nil
+}
+
+func (n Num) ToString(scale int) string {
+	// TODO(fredgan): convert Decimal128 to decimal string with scale
+	return ""
+}
+
+func (n Num) ToIntegerString() string {
+	// TODO(fredgan): convert Decimal128 to big integer string
+	return ""
+}
+
 // LowBits returns the low bits of the two's complement representation of the number.
 func (n Num) LowBits() uint64 { return n.lo }
 
@@ -70,4 +86,17 @@ func (n Num) Sign() int {
 		return 0
 	}
 	return int(1 | (n.hi >> 63))
+}
+
+type DecimalComponents struct {
+	whole_digits string
+	fractional_digits string
+	exponent int
+	sign int8
+	has_exponent bool
+}
+
+func parseDecimalComponents(input string, component DecimalComponents) bool {
+	// TODO(fredgan): parse string to DecimalComponents
+	return true
 }
