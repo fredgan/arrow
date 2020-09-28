@@ -17,6 +17,7 @@
 package arrjson // import "github.com/apache/arrow/go/arrow/internal/arrjson"
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -49,9 +50,6 @@ func TestReadWrite(t *testing.T) {
 
 	for name, recs := range arrdata.Records {
 		t.Run(name, func(t *testing.T) {
-			if name == "decimal128" {
-				t.Skip() // FIXME(sbinet): implement full decimal128 support
-			}
 			mem := memory.NewCheckedAllocator(memory.NewGoAllocator())
 			defer mem.AssertSize(t, 0)
 
@@ -86,6 +84,7 @@ func TestReadWrite(t *testing.T) {
 
 			fileBytes, _ := ioutil.ReadFile(f.Name())
 			if wantJSONs[name] != string(fileBytes) {
+				fmt.Println(string(fileBytes))
 				t.Fatalf("not expected JSON pretty output for case: %v", name)
 			}
 
@@ -3100,5 +3099,90 @@ func makeDurationsWantJSONs() string {
 }
 
 func makeDecimal128sWantJSONs() string {
-	return `` // FIXME(fredgan): implement full decimal128 JSON support
+	return `{
+  "schema": {
+    "fields": [
+      {
+        "name": "dec128s",
+        "type": {
+          "name": "decimal128",
+          "byteWidth": 16
+        },
+        "nullable": true,
+        "children": []
+      }
+    ]
+  },
+  "batches": [
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            "571849066284996100127",
+            "0",
+            "0",
+            "627189298506124754978",
+            "645636042579834306595"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            "75631650702291616297",
+            "0",
+            "0",
+            "811656739243220271148",
+            "830103483316929822765"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 5,
+      "columns": [
+        {
+          "name": "dec128s",
+          "count": 5,
+          "VALIDITY": [
+            1,
+            0,
+            0,
+            1,
+            1
+          ],
+          "DATA": [
+            "940783947759187132467",
+            "0",
+            "0",
+            "996124179980315787318",
+            "101457092405425338935"
+          ]
+        }
+      ]
+    }
+  ]
+}`
 }

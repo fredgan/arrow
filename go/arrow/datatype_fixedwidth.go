@@ -132,7 +132,7 @@ type Decimal128Type struct {
 
 func (*Decimal128Type) ID() Type      { return DECIMAL }
 func (*Decimal128Type) Name() string  { return "decimal" }
-func (*Decimal128Type) BitWidth() int { return 16 }
+func (*Decimal128Type) BitWidth() int { return 128 }
 func (t *Decimal128Type) String() string {
 	return fmt.Sprintf("%s(%d, %d)", t.Name(), t.Precision, t.Scale)
 }
@@ -188,6 +188,7 @@ var (
 		Timestamp_ms    FixedWidthDataType
 		Timestamp_us    FixedWidthDataType
 		Timestamp_ns    FixedWidthDataType
+		Decimal128      FixedWidthDataType
 	}{
 		Boolean:         &BooleanType{},
 		Date32:          &Date32Type{},
@@ -207,6 +208,7 @@ var (
 		Timestamp_ms:    &TimestampType{Unit: Millisecond, TimeZone: "UTC"},
 		Timestamp_us:    &TimestampType{Unit: Microsecond, TimeZone: "UTC"},
 		Timestamp_ns:    &TimestampType{Unit: Nanosecond, TimeZone: "UTC"},
+		Decimal128:      &Decimal128Type{},
 	}
 
 	_ FixedWidthDataType = (*FixedSizeBinaryType)(nil)

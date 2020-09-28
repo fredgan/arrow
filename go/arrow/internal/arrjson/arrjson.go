@@ -21,6 +21,7 @@ package arrjson // import "github.com/apache/arrow/go/arrow/internal/arrjson"
 import (
 	"encoding/hex"
 	"encoding/json"
+	"github.com/apache/arrow/go/arrow/decimal128"
 	"strconv"
 	"strings"
 
@@ -60,8 +61,10 @@ type dataType struct {
 	ListSize  int32  `json:"listSize,omitempty"`
 	Unit      string `json:"unit,omitempty"`
 	TimeZone  string `json:"timezone,omitempty"`
-	Scale     int    `json:"scale,omitempty"` // for Decimal128
+	Scale     int32    `json:"scale,omitempty"` // for Decimal128
 }
+
+type dataType
 
 func dtypeToJSON(dt arrow.DataType) dataType {
 	switch dt := dt.(type) {
@@ -150,6 +153,13 @@ func dtypeToJSON(dt arrow.DataType) dataType {
 		return dataType{
 			Name:      "fixedsizebinary",
 			ByteWidth: dt.ByteWidth,
+		}
+	case *arrow.Decimal128Type:
+		return dataType{
+			Name: "decimal128",
+			Precision: strconv.Itoa(int(dt.Precision)),
+			Scale: dt.Scale,
+			ByteWidth: dt.BitWidth(),
 		}
 	}
 	panic(xerrors.Errorf("unknown arrow.DataType %v", dt))
@@ -260,6 +270,8 @@ func dtypeFromJSON(dt dataType, children []Field) arrow.DataType {
 		case "NANOSECOND":
 			return arrow.FixedWidthTypes.Duration_ns
 		}
+	case "decimal128":
+		return arrow.FixedWidthTypes.Decimal128
 	}
 	panic(xerrors.Errorf("unknown DataType %#v", dt))
 }
@@ -617,6 +629,13 @@ func arrayFromJSON(mem memory.Allocator, dt arrow.DataType, arr Array) array.Int
 		bldr.AppendValues(data, valids)
 		return bldr.NewArray()
 
+	case *arrow.Decimal128Type:
+		bldr := array.NewDecimal128Builder(mem, dt)
+		defer bldr.Release()
+		data := decimal128FromJSON(arr.Data)
+		valids := validsFromJSON(arr.Valids)
+		bldr.AppendValues(data, valids)
+		return bldr.NewArray()
 	default:
 		panic(xerrors.Errorf("unknown data type %v %T", dt, dt))
 	}
@@ -857,7 +876,13 @@ func arrayToJSON(field arrow.Field, arr array.Interface) Array {
 			Data:   durationToJSON(arr),
 			Valids: validsToJSON(arr),
 		}
-
+	case *array.Decimal128:
+		return Array{
+			Name: field.Name,
+			Count: arr.Len(),
+			Data: decimal128ToJSON(arr),
+			Valids: validsToJSON(arr),
+		}
 	default:
 		panic(xerrors.Errorf("unknown array type %T", arr))
 	}
@@ -1352,6 +1377,30 @@ func durationToJSON(arr *array.Duration) []interface{} {
 	for i := range o {
 		if arr.IsValid(i) {
 			o[i] = strconv.FormatInt(int64(arr.Value(i)), 10)
+		} else {
+			o[i] = "0"
+		}
+	}
+	return o
+}
+
+func decimal128FromJSON(vs []interface{}) []decimal128.Num {
+	o := make([]decimal128.Num, len(vs))
+	for i, v := range vs {
+		vv, err := decimal128.FromString(v.(string), nil, nil)
+		if err != nil {
+			panic(err)
+		}
+		o[i] = *vv
+	}
+	return o
+}
+
+func decimal128ToJSON(arr *array.Decimal128) []interface{} {
+	o := make([]interface{}, arr.Len())
+	for i := range o {
+		if arr.IsValid(i) {
+			o[i] = arr.Value(i).ToIntegerString()
 		} else {
 			o[i] = "0"
 		}
